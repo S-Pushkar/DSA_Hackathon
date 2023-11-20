@@ -152,6 +152,7 @@ int findMinDriver(passenger p) {
     ptr = 0;
     while (d != NULL) {
         if (ptr == req) {
+            printf("Driver %s has been alotted with car %s\n", (d -> curDr).name, (d -> curDr).car);
             (d->curDr).passengerPhoneAlloted = p.phone;
             (d->curDr).isAvailable = 0;
             break;
@@ -298,7 +299,6 @@ int main() {
                     addPassenger(curP);
                     int status = findMinDriver(curP);
                     if (status) {
-                        printf("Driver has been allotted to you.\n");
                         printf("Enjoy the ride!!\n");
                     } else {
                         printf("Couldn't find a driver for you.");
