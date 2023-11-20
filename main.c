@@ -19,6 +19,11 @@ typedef struct passenger {
     int longitude;
 } passenger;
 
+typedef struct allPassengers {
+    passenger curr;
+    struct allPassengers* next;
+} allPassengers;
+
 int main() {
     while(1) {
         printf("Are you a driver or a passenger?\n");
