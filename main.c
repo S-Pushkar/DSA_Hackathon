@@ -9,6 +9,7 @@ typedef struct driver {
     int isAvailable;
     int latitude;
     int longitude;
+    long long passengerPhoneAlloted;
 } driver;
 
 typedef struct allDrivers {
@@ -111,6 +112,43 @@ void addPassenger(passenger p) {
     tail -> next = node;
 }
 
+int findMinDriver(passenger p) {
+    allDrivers *d = driverList;
+    if (d == NULL) {
+        return 0;
+    }
+
+    int mn = INT_MAX;
+    int ptr = 0;
+    int req = -1;
+    while (d != NULL) {
+        if ((d -> curDr).isAvailable) {
+            int dist = sqrt((p.latitude - (d -> curDr).latitude) * (p.latitude - (d -> curDr).latitude) + (p.longitude - (d -> curDr).longitude) * (p.longitude - (d -> curDr).longitude));
+            if (dist < mn){
+                mn = dist;
+                req = ptr;
+            }
+        }
+        ptr++;
+    }
+
+    if (req == -1) {
+        return 0;
+    }
+
+    d = driverList;
+    while (d != NULL) {
+        if (ptr == req) {
+            (d -> curDr).passengerPhoneAlloted = p.phone;
+            (d -> curDr).isAvailable = 0;
+            break;
+        }
+        ptr++;
+    }
+
+    return 1;
+}
+
 float generateBill(int curLati, int curLongi, int destLati, int destLongi) {
     float base = 50.12421;
     float bill = base + sqrt((curLati - destLati) * (curLati - destLati) + (curLongi - destLongi) * (curLongi - destLongi)) * 10;
@@ -126,7 +164,7 @@ int main() {
         printf("Press any other number to quit.\n");
         
         int isDriver;
-        scanf("%d\n", &isDriver);
+        scanf("%d", &isDriver);
 
         if (isDriver != 1 && isDriver != 2) {
             printf("Shutting down the service...\n");
@@ -180,10 +218,35 @@ int main() {
                     float bill = generateBill((t -> curDr).latitude, (t -> curDr).longitude, destLatitude, destLongitude);
                     printf("Bill is %f\n", bill);
 
-                    printf("You are now available for new rides.\n");
-                    (t -> curDr).isAvailable = 1;
+                    printf("You are now available for new rides. Looking for passengers...\n");
+                    if (passList != NULL) {
+                        findMinDriver(passList -> curDr);
+
+                        printf("Passenger with phone %lld has been alotted to you.\n", (passList -> curDr).phone);
+                        passList = passList -> next;
+                    } else {
+                        printf("Please wait for the passengers.\n");
+                        (t -> curDr).isAvailable = 1;
+                    }
                 } else {
+                    printf("Enter your latitude: ");
+                    scanf("%d", &curD.latitude);
+
+                    printf("Enter your longitude: ");
+                    scanf("%d", &curD.longitude);
+                    
                     addDriver(curD);
+                    printf("You are added to the registry.\n");
+                    
+                    if (passList != NULL) {
+                        findMinDriver(passList -> curDr);
+
+                        printf("Passenger with phone %lld has been alotted to you.\n", (passList -> curDr).phone);
+                        passList = passList -> next;
+                    } else {
+                        printf("Please wait for the passengers.\n");
+                        (t -> curDr).isAvailable = 1;
+                    }
                 }
                 break;
 
@@ -198,6 +261,9 @@ int main() {
                 printf("Enter your longitude: ");
                 scanf("%d", &curP.longitude);
 
+                printf("Enter your phone number (+91): ");
+                scanf("%lld", &curP.phone);
+
                 // Check if the passenger exists
                 int exist = passExists(curP);
                 if (exist) {
@@ -211,6 +277,24 @@ int main() {
                     }
                 } else {
                     addPassenger(curP);
+                    int status = findMinDriver(curP);
+                    if (status) {
+                        printf("Driver has been alotted to you.\n");
+                        printf("Enjoy the ride!!\n");
+                    } else {
+                        printf("Couldn't find the driver for you.");
+
+                        printf("Do you want to wait?\n");
+                        printf("Enter 1 to cancel | Any other number to wait: ");
+
+                        int c;
+                        scanf("%d", &c);
+
+                        if (c == 1) {
+                            deletePassenger(curP);
+                            break;
+                        }
+                    }
                 }
                 break;
 
