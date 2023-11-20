@@ -8,6 +8,11 @@ typedef struct driver {
     int longitude;
 } driver;
 
+typedef struct allDrivers {
+    driver curr;
+    struct allDrivers* next;
+} allDrivers;
+
 typedef struct passenger {
     char name[20];
     int latitude;
@@ -16,7 +21,10 @@ typedef struct passenger {
 
 int main() {
     while(1) {
-
+        printf("Are you a driver or a passenger?\n");
+        printf("Press 1 for driver.\n");
+        printf("Press 2 for passenger.\n");
+        int 
     }
     return 0;
 }
