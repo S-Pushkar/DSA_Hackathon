@@ -155,6 +155,8 @@ int findMinDriver(passenger p) {
             printf("Driver %s has been alotted with car %s\n", (d -> curDr).name, (d -> curDr).car);
             (d->curDr).passengerPhoneAlloted = p.phone;
             (d->curDr).isAvailable = 0;
+
+            deletePassenger(p);
             break;
         }
         ptr++;
